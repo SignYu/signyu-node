@@ -37,6 +37,17 @@ export interface CreateDocumentParams {
    * Defaults to your account's reply-to setting, then your login email.
    */
   replyTo?: string;
+  /**
+   * Set to `false` to stop SignYu emailing signers for this document: no
+   * signing-request email and no completion email. Send each signer the
+   * `signUrl` from your own system instead. Default `true`.
+   */
+  notifySigners?: boolean;
+  /**
+   * Set to `false` to stop SignYu emailing you (the account owner) when the
+   * document is completed. Use webhooks or `documents.get` instead. Default `true`.
+   */
+  notifyOwner?: boolean;
 }
 
 export interface ListDocumentsParams {
@@ -86,6 +97,12 @@ class Documents {
     form.append("file", toPdfBlob(params.file), params.fileName ?? "document.pdf");
     if (params.name !== undefined) form.append("name", params.name);
     if (params.replyTo !== undefined) form.append("replyTo", params.replyTo);
+    if (params.notifySigners !== undefined) {
+      form.append("notifySigners", params.notifySigners ? "true" : "false");
+    }
+    if (params.notifyOwner !== undefined) {
+      form.append("notifyOwner", params.notifyOwner ? "true" : "false");
+    }
     return this.client._request<CreatedDocument>({
       method: "POST",
       path: "/api/v1/documents",

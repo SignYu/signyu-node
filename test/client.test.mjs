@@ -72,6 +72,33 @@ test("documents.create sends replyTo only when provided and parses the response"
   assert.equal(fetch.calls[1].init.body.has("replyTo"), false);
 });
 
+test("documents.create sends notifySigners/notifyOwner as 'true'/'false' only when provided", async () => {
+  const fetch = mockFetch(() =>
+    json(
+      { documentId: "d", name: "x", status: "PENDING", replyTo: null, notifySigners: false, notifyOwner: false },
+      201
+    )
+  );
+  const client = new SignYu({ apiKey: "k", fetch });
+  const res = await client.documents.create({
+    file: Buffer.from("%PDF"),
+    notifySigners: false,
+    notifyOwner: false,
+  });
+  assert.equal(res.notifySigners, false);
+  assert.equal(res.notifyOwner, false);
+  assert.equal(fetch.calls[0].init.body.get("notifySigners"), "false");
+  assert.equal(fetch.calls[0].init.body.get("notifyOwner"), "false");
+
+  await client.documents.create({ file: Buffer.from("%PDF"), notifySigners: true });
+  assert.equal(fetch.calls[1].init.body.get("notifySigners"), "true");
+  assert.equal(fetch.calls[1].init.body.has("notifyOwner"), false);
+
+  await client.documents.create({ file: Buffer.from("%PDF") });
+  assert.equal(fetch.calls[2].init.body.has("notifySigners"), false);
+  assert.equal(fetch.calls[2].init.body.has("notifyOwner"), false);
+});
+
 test("documents.get parses replyTo", async () => {
   const fetch = mockFetch(() =>
     json({ documentId: "d", name: "x", status: "PENDING", replyTo: null, signers: [] })

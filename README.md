@@ -63,7 +63,7 @@ const signyu = new SignYu({
 
 ## Methods
 
-### `documents.create({ file, fileName?, name?, replyTo? })`
+### `documents.create({ file, fileName?, name?, replyTo?, notifySigners?, notifyOwner? })`
 
 `POST /api/v1/documents`. Uploads a PDF (at most 10MB) and creates a document in `PENDING` state. `file` can be a `Buffer`, `Uint8Array`, `ArrayBuffer` or `Blob`. It is always sent as `application/pdf`. `fileName` defaults to `document.pdf`, and `name` defaults to the file name.
 
@@ -77,7 +77,17 @@ const doc = await signyu.documents.create({
 console.log(doc.replyTo); // "legal@example.com"
 ```
 
-Returns `{ documentId, name, status, replyTo }`.
+`notifySigners: false` stops SignYu emailing signers for this document: no signing-request email and no completion email. Send each signer the `signUrl` (returned by `documents.send` and `documents.get`) from your own system instead. Signers can still download their signed copy on the signing page. `notifyOwner: false` stops the completion email to you, the account owner; use webhooks or `documents.get` instead. Both default to `true`.
+
+```ts
+const doc = await signyu.documents.create({
+  file: readFileSync("agreement.pdf"),
+  notifySigners: false,
+  notifyOwner: false,
+});
+```
+
+Returns `{ documentId, name, status, replyTo, notifySigners, notifyOwner }`.
 
 ### `documents.list({ limit?, offset? })`
 

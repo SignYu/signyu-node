@@ -54,6 +54,10 @@ export interface CreatedDocument {
   status: DocumentStatus;
   /** Effective reply-to address used for signer emails. */
   replyTo: string | null;
+  /** `false` when SignYu sends no emails to signers for this document. */
+  notifySigners: boolean;
+  /** `false` when SignYu sends no completion email to the account owner. */
+  notifyOwner: boolean;
 }
 
 export interface SignerCounts {
@@ -104,6 +108,10 @@ export interface Document {
   certificateUrl: string | null;
   /** Effective reply-to address used for signer emails. */
   replyTo: string | null;
+  /** `false` when SignYu sends no emails to signers for this document. */
+  notifySigners: boolean;
+  /** `false` when SignYu sends no completion email to the account owner. */
+  notifyOwner: boolean;
   signers: DocumentSigner[];
 }
 
